@@ -10,6 +10,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 	public Node<K,T> root;
 	public static final int D = 2;
 
+//	TODO: make sure to handle cases where the num might not be in the list and causes it to go out of bounds of array
 	private T searchHelper(K key, Node<K,T> node){
 		if (node.isLeafNode){
 			LeafNode<K, T> lnode = (LeafNode<K,T>)node;
@@ -18,12 +19,23 @@ public class BPlusTree<K extends Comparable<K>, T> {
 				K fetchedKey = lnode.keys.get(i);
 				if (key.compareTo(fetchedKey) == 0){
 					return lnode.values.get(i);
-				} else if (key.compareTo(fetchedKey) > 0 ){ // Break if the key is smaller then fetched (this means no matches)
+				// Break if the key is smaller then fetched (this means no matches)
+				} else if (key.compareTo(fetchedKey) > 0 ){ 
 					return null;
 				}
 			}
 		} else {
-			
+			IndexNode<K,T> inode = (IndexNode<K,T>)node;
+			for (int i=0; i< inode.keys.size(); i++){
+				K fetchedKey = inode.keys.get(i);
+				//if key is less than fetched then return fetched's left child
+				if (key.compareTo(fetchedKey) < 0){
+					return searchHelper(key, inode.children.get(i));
+				//if your on last key in node (and larger) traverse right child
+				}else if (i == inode.keys.size()-1) {
+					return searchHelper(key, inode.children.get(i+1));
+				}
+			}
 		}
 		return null;
 	}
