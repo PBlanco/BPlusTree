@@ -138,6 +138,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 	public Entry<K, Node<K,T>> splitLeafNode(LeafNode<K,T> leaf) {
 		int middleIndex = leaf.values.size()/2;
 		//get pointer (key we split on) to pass up
+//		TODO: Make this not remove the middle index
 		K pointer = leaf.keys.remove(middleIndex);
 		LeafNode<K,T> leftLeafNode = new LeafNode<K,T>(pointer, leaf.values.remove(middleIndex));
 		int size =  leaf.values.size();
@@ -159,8 +160,33 @@ public class BPlusTree<K extends Comparable<K>, T> {
 	 * @return new key/node pair as an Entry
 	 */
 	public Entry<K, Node<K,T>> splitIndexNode(IndexNode<K,T> index) {
-
-		return null;
+		int middleIndex = index.keys.size()/2;
+		//get pointer (key we split on) to pass up
+		K pointer = index.keys.remove(middleIndex);
+		//Node<K,T> pointerChild = index.children.remove(middleIndex+1);
+		
+		
+		
+		ArrayList<Node<K,T>> rightChildren = new ArrayList<Node<K,T>>();
+		ArrayList<K> rightKeys = new ArrayList<K>();
+		
+		
+		int size =  index.keys.size();
+		
+		//add values to right list while removing from oxiginal inded
+		for (int i = middleIndex; i <size; i++){
+			rightKeys.add(index.keys.remove(i));
+			rightChildren.add(index.children.remove(middleIndex));
+		}
+		//add last child
+		rightChildren.add(index.children.remove(middleIndex));
+		
+		//add values to new right index to be passed back
+		IndexNode<K,T>newIndexNode = new IndexNode<K,T>(rightKeys, rightChildren);
+				
+		//create entry object
+		Entry<K, Node<K,T>> entry = new AbstractMap.SimpleEntry<K, Node<K,T>>(pointer, newIndexNode);
+		return entry;
 	}
 
 	/**
