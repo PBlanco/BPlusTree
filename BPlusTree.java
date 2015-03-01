@@ -9,9 +9,12 @@ public class BPlusTree<K extends Comparable<K>, T> {
 
 	public Node<K,T> root;
 	public static final int D = 2;
+	private LeafNode<K,T> lNode;
 
 //	TODO: make sure to handle cases where the num might not be in the list and causes it to go out of bounds of array
 	private T searchHelper(K key, Node<K,T> node){
+		if(node == null) return null;
+		
 		if (node.isLeafNode){
 			LeafNode<K, T> lnode = (LeafNode<K,T>)node;
 			//iterate through keys to find a match
@@ -47,7 +50,30 @@ public class BPlusTree<K extends Comparable<K>, T> {
 	 * @return value
 	 */
 	public T search(K key) {
-		return this.searchHelper(key, root);
+		return this.searchHelper(key, this.root);
+	}
+	
+	private void insertHelper(K key, T value, Node<K,T> node, Node<K,T>parentNode ){
+		if (node.isLeafNode){
+			LeafNode<K, T> leafNode = (LeafNode<K, T>) node;
+			leafNode.insertSorted(key, value);
+			//check if this overflowed node
+			if(leafNode.isOverflowed()){
+				Entry<K, Node<K,T>> splitObj = this.splitLeafNode(leafNode);
+				K splitKey = splitObj.getKey();
+				Node<K,T> rightLeaf = splitObj.getValue();
+				
+				//make left side split node leaf
+				//add that new split key value and children pointers to parent index (if one exists)
+				
+				//is the parent index overflowed? then split it and repeat
+			}
+			return;
+			
+		} else {
+			
+		}
+		
 	}
 
 	/**
@@ -57,7 +83,13 @@ public class BPlusTree<K extends Comparable<K>, T> {
 	 * @param value
 	 */
 	public void insert(K key, T value) {
-
+		//Lazy instantiation of root node
+		if (this.root == null){
+			LeafNode<K,T> lNode = new LeafNode(key, value);
+			this.root = lNode;
+			return;
+		}
+		this.insertHelper(key, value, this.root, null);
 	}
 
 	/**
