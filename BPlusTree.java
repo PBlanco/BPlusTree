@@ -114,7 +114,18 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			this.root = lNode;
 			return;
 		}
-		this.insertHelper(key, value, this.root);
+		Entry<K, Node<K,T>> overflowed = this.insertHelper(key, value, this.root);
+		
+		//overflow made it to root
+		if (overflowed != null){
+			IndexNode<K,T> rootIndex = (IndexNode<K, T>) this.root;
+			//create a new root with key as the split key, 
+			//left child as the modified right split of root,
+			//and right child as the left split of root node
+			IndexNode<K,T> newRoot = new IndexNode<K,T>(overflowed.getKey(), rootIndex, overflowed.getValue());
+			this.root = newRoot;
+		}
+		
 	}
 
 	/**
