@@ -1,4 +1,5 @@
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Map.Entry;
 
 /**
@@ -53,26 +54,21 @@ public class BPlusTree<K extends Comparable<K>, T> {
 		return this.searchHelper(key, this.root);
 	}
 	
-	private void insertHelper(K key, T value, Node<K,T> node, Node<K,T>parentNode ){
+	private Entry<K, Node<K,T>> insertHelper(K key, T value, Node<K,T> node){
 		if (node.isLeafNode){
 			LeafNode<K, T> leafNode = (LeafNode<K, T>) node;
 			leafNode.insertSorted(key, value);
 			//check if this overflowed node
 			if(leafNode.isOverflowed()){
-				Entry<K, Node<K,T>> splitObj = this.splitLeafNode(leafNode);
-				K splitKey = splitObj.getKey();
-				Node<K,T> rightLeaf = splitObj.getValue();
-				
-				//make left side split node leaf
-				//add that new split key value and children pointers to parent index (if one exists)
-				
-				//is the parent index overflowed? then split it and repeat
+				//there was an overflow so return split leaf
+				return this.splitLeafNode(leafNode);
 			}
-			return;
+			return null;
 			
 		} else {
 			
 		}
+		return null;
 		
 	}
 
@@ -89,7 +85,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			this.root = lNode;
 			return;
 		}
-		this.insertHelper(key, value, this.root, null);
+		this.insertHelper(key, value, this.root);
 	}
 
 	/**
@@ -100,8 +96,19 @@ public class BPlusTree<K extends Comparable<K>, T> {
 	 * @return the key/node pair as an Entry
 	 */
 	public Entry<K, Node<K,T>> splitLeafNode(LeafNode<K,T> leaf) {
-
-		return null;
+		int middleIndex = leaf.values.size()/2;
+		//get pointer (key we split on) to pass up
+		K pointer = leaf.keys.remove(middleIndex);
+		LeafNode<K,T> leftLeafNode = new LeafNode<K,T>(pointer, leaf.values.remove(middleIndex));
+		int size =  leaf.values.size();
+		
+		//add values to right list while removing from leaf
+		for (int i = middleIndex; i <size; i++){
+			leftLeafNode.insertSorted(leaf.keys.get(middleIndex), leaf.values.get(middleIndex));
+		}
+		//create entry object
+		Entry<K, Node<K,T>> entry = new AbstractMap.SimpleEntry<K, Node<K,T>>(pointer, leftLeafNode);
+		return entry;
 	}
 
 	/**
