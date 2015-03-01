@@ -54,6 +54,21 @@ public class BPlusTree<K extends Comparable<K>, T> {
 		return this.searchHelper(key, this.root);
 	}
 
+	private Entry<K, Node<K,T>> overflowHelper(Entry<K, Node<K,T>> overflowed, IndexNode<K,T> inode, int index, Node<K,T> node){
+		if(overflowed != null){
+			//insert the new pointer into the index after the split pointer who is at index i
+			inode.insertSorted(overflowed, i+1);;
+			//check if it has caused an overflow of the index
+			if(inode.isOverflowed()){
+				Entry<K, Node<K, T>> indexOverflow =  this.splitIndexNode(inode);
+				node = inode;
+				return indexOverflow;
+			}
+		}
+		//assigned modified inode back to tree if insert was clean
+		node = inode;
+		return null;
+	}
 	
 	private Entry<K, Node<K,T>> insertHelper(K key, T value, Node<K,T> node){
 		if (node.isLeafNode){
@@ -76,23 +91,12 @@ public class BPlusTree<K extends Comparable<K>, T> {
 				//if key is less than fetched then return fetched's left child
 				if (key.compareTo(fetchedKey) < 0){
 					Entry<K, Node<K, T>> overflowed = this.insertHelper(key, value, inode.children.get(i));
-					if(overflowed != null){
-						//insert the new pointer into the index after the split pointer who is at index i
-						inode.insertSorted(overflowed, i+1);;
-						//check if it has caused an overflow of the index
-						if(inode.isOverflowed()){
-							//split
-							//propogate up
-						}
-					
-					}
-					
+					return this.overflowHelper(overflowed, inode, i, node);
+
 				//if you're on last key in node (and larger) traverse right child
 				}else if (i == inode.keys.size()-1) {
 					Entry<K, Node<K, T>> overflowed = this.insertHelper(key, value, inode.children.get(i+1));
-					if(overflowed != null){
-						//Handle the case that you've been returned a split node
-					}
+					return this.overflowHelper(overflowed, inode, i, node);
 				}
 			}
 		}
