@@ -53,6 +53,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 	public T search(K key) {
 		return this.searchHelper(key, this.root);
 	}
+
 	
 	private Entry<K, Node<K,T>> insertHelper(K key, T value, Node<K,T> node){
 		if (node.isLeafNode){
@@ -61,12 +62,39 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			//check if this overflowed node
 			if(leafNode.isOverflowed()){
 				//there was an overflow so return split leaf
-				return this.splitLeafNode(leafNode);
+				Entry<K, Node<K,T>> overflowed = this.splitLeafNode(leafNode);
+				//assigned the modified leafNode to node
+				node = leafNode;
+				return overflowed;
 			}
+			//return null if insert is successful
 			return null;
-			
 		} else {
-			
+			IndexNode<K,T> inode = (IndexNode<K,T>)node;
+			for (int i=0; i< inode.keys.size(); i++){
+				K fetchedKey = inode.keys.get(i);
+				//if key is less than fetched then return fetched's left child
+				if (key.compareTo(fetchedKey) < 0){
+					Entry<K, Node<K, T>> overflowed = this.insertHelper(key, value, inode.children.get(i));
+					if(overflowed != null){
+						//insert the new pointer into the index after the split pointer who is at index i
+						inode.insertSorted(overflowed, i+1);;
+						//check if it has caused an overflow of the index
+						if(inode.isOverflowed()){
+							//split
+							//propogate up
+						}
+					
+					}
+					
+				//if you're on last key in node (and larger) traverse right child
+				}else if (i == inode.keys.size()-1) {
+					Entry<K, Node<K, T>> overflowed = this.insertHelper(key, value, inode.children.get(i+1));
+					if(overflowed != null){
+						//Handle the case that you've been returned a split node
+					}
+				}
+			}
 		}
 		return null;
 		
@@ -90,7 +118,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 
 	/**
 	 * TODO Split a leaf node and return the new right node and the splitting
-	 * key as an Entry<slitingKey, RightNode>
+	 * key as an Entry<splitingKey, RightNode>
 	 * 
 	 * @param leaf
 	 * @return the key/node pair as an Entry
@@ -110,10 +138,10 @@ public class BPlusTree<K extends Comparable<K>, T> {
 		Entry<K, Node<K,T>> entry = new AbstractMap.SimpleEntry<K, Node<K,T>>(pointer, leftLeafNode);
 		return entry;
 	}
-
+ 
 	/**
 	 * TODO split an indexNode and return the new right node and the splitting
-	 * key as an Entry<slitingKey, RightNode>
+	 * key as an Entry<splitingKey, RightNode>
 	 * 
 	 * @param index
 	 * @return new key/node pair as an Entry
