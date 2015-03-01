@@ -54,21 +54,6 @@ public class BPlusTree<K extends Comparable<K>, T> {
 		return this.searchHelper(key, this.root);
 	}
 
-	private Entry<K, Node<K,T>> overflowHelper(Entry<K, Node<K,T>> overflowed, IndexNode<K,T> inode, int index, Node<K,T> node){
-		if(overflowed != null){
-			//insert the new pointer into the index after the split pointer who is at index i
-			inode.insertSorted(overflowed, i+1);;
-			//check if it has caused an overflow of the index
-			if(inode.isOverflowed()){
-				Entry<K, Node<K, T>> indexOverflow =  this.splitIndexNode(inode);
-				node = inode;
-				return indexOverflow;
-			}
-		}
-		//assigned modified inode back to tree if insert was clean
-		node = inode;
-		return null;
-	}
 	
 	private Entry<K, Node<K,T>> insertHelper(K key, T value, Node<K,T> node){
 		if (node.isLeafNode){
@@ -84,19 +69,31 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			}
 			//return null if insert is successful
 			return null;
+			
 		} else {
 			IndexNode<K,T> inode = (IndexNode<K,T>)node;
 			for (int i=0; i< inode.keys.size(); i++){
 				K fetchedKey = inode.keys.get(i);
+				Entry<K, Node<K, T>> overflowed = null;
+				
 				//if key is less than fetched then return fetched's left child
 				if (key.compareTo(fetchedKey) < 0){
-					Entry<K, Node<K, T>> overflowed = this.insertHelper(key, value, inode.children.get(i));
-					return this.overflowHelper(overflowed, inode, i, node);
-
+					overflowed = this.insertHelper(key, value, inode.children.get(i));
 				//if you're on last key in node (and larger) traverse right child
 				}else if (i == inode.keys.size()-1) {
-					Entry<K, Node<K, T>> overflowed = this.insertHelper(key, value, inode.children.get(i+1));
-					return this.overflowHelper(overflowed, inode, i, node);
+					overflowed = this.insertHelper(key, value, inode.children.get(i+1));
+				}
+				
+				//value was inserted, check if it caused an overflow
+				if(overflowed != null){
+					//insert the new pointer into the index after the split pointer who is at index i
+					inode.insertSorted(overflowed, i+1);;
+					//check if it has caused an overflow of the index
+					if(inode.isOverflowed()){
+						Entry<K, Node<K, T>> indexOverflow =  this.splitIndexNode(inode);
+						node = inode;
+						return indexOverflow;
+					}
 				}
 			}
 		}
