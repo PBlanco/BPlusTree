@@ -12,7 +12,6 @@ public class BPlusTree<K extends Comparable<K>, T> {
 	public static final int D = 2;
 	private LeafNode<K,T> lNode;
 
-//	TODO: make sure to handle cases where the num might not be in the list and causes it to go out of bounds of array
 	private T searchHelper(K key, Node<K,T> node){
 		if(node == null) return null;
 		
@@ -118,7 +117,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 		
 		//overflow made it to root
 		if (overflowed != null){
-			IndexNode<K,T> rootIndex = (IndexNode<K, T>) this.root;
+			Node<K,T> rootIndex =  this.root;
 			//create a new root with key as the split key, 
 			//left child as the modified right split of root,
 			//and right child as the left split of root node
@@ -136,16 +135,17 @@ public class BPlusTree<K extends Comparable<K>, T> {
 	 * @return the key/node pair as an Entry
 	 */
 	public Entry<K, Node<K,T>> splitLeafNode(LeafNode<K,T> leaf) {
+		//TODO: Fix this so that it splits correctly
 		int middleIndex = leaf.values.size()/2;
 		//get pointer (key we split on) to pass up
-//		TODO: Make this not remove the middle index
 		K pointer = leaf.keys.remove(middleIndex);
 		LeafNode<K,T> leftLeafNode = new LeafNode<K,T>(pointer, leaf.values.remove(middleIndex));
 		int size =  leaf.values.size();
 		
+//		TODO: improve this by not using insertSorted (slower runtime)
 		//add values to right list while removing from leaf
 		for (int i = middleIndex; i <size; i++){
-			leftLeafNode.insertSorted(leaf.keys.get(middleIndex), leaf.values.get(middleIndex));
+			leftLeafNode.insertSorted(leaf.keys.remove(middleIndex), leaf.values.remove(middleIndex));
 		}
 		//create entry object
 		Entry<K, Node<K,T>> entry = new AbstractMap.SimpleEntry<K, Node<K,T>>(pointer, leftLeafNode);

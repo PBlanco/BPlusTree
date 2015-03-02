@@ -20,20 +20,21 @@ public class Tests {
 		Utils.bulkInsert(tree, alphabet, alphabetStrings);
 
 		String test = Utils.outputTree(tree);
+		System.out.print(test);
 		String correct = 
 		    "@c/e/@%%[(a,a);(b,b);]#[(c,c);(d,d);]#[(e,e);(f,f);(g,g);]$%%";
 		
 		
 		assertEquals(correct, test);
-
+		/*
 		tree.delete('a');
 
 		test = Utils.outputTree(tree);
 		correct = "@e/@%%[(b,b);(c,c);(d,d);]#[(e,e);(f,f);(g,g);]$%%";
-    assertEquals(correct, test);
-
+		assertEquals(correct, test);
+		 */
 	}
-
+/*
   // add some nodes, see if it comes out right, delete one, see if it's right
   @Test
   public void testHybrid2() {
@@ -121,4 +122,6 @@ public class Tests {
     }
     return (1+maxDepth);
   }
+  */
 }
+
