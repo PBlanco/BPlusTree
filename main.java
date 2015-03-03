@@ -5,25 +5,24 @@ public class main {
 		// TODO Auto-generated method stub
 		System.out.println("Test:");
 
-//		BPlusTree<Integer, String> tree = new BPlusTree<Integer, String>();
-//		
-//		tree.insert(1, "a");
-//		String test = Utils.outputTree(tree);
-//		System.out.println("Test: "+test);
-//		tree.insert(5, "b");
-//		String test1 = Utils.outputTree(tree);
-//		System.out.println("Test: "+test1);
-//		tree.insert(8, "c");
-//		String test2 = Utils.outputTree(tree);
-//		System.out.println("Test: "+test2);
-//		tree.insert(10, "c");
-//		String test3 = Utils.outputTree(tree);
-//		System.out.println("Test: "+test3);
-//		tree.insert(12, "d");
-//		String test4 = Utils.outputTree(tree);
-//		System.out.println("Test: "+test4);
+		BPlusTree<Integer, String> tree = new BPlusTree<Integer, String>();
+		
+		//Delete Tests
+		tree.insert(1, "a");
+		String test = Utils.prettyOutputTree(tree);
+		System.out.print(test);
+		tree.insert(5, "b");
+		String test1 = Utils.prettyOutputTree(tree);
+		System.out.print(test1);
+		tree.delete(1);
+		String del1 = Utils.prettyOutputTree(tree);
+		System.out.print(del1);
+		
+
 	
-//		 Character alphabet[] = new Character[] { 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
+		//insert tests
+		/*
+		 Character alphabet[] = new Character[] { 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
 		
 		 Character alphabet[] = new Character[] { 'f','u','v','a','b','c','d','l','m','n','o','e','h','i','p','j','k','q','r','s','t'};
 		 
@@ -47,6 +46,7 @@ public class main {
 			 
 		 }
 		 
+		 */
 	}
 
 }

@@ -49,5 +49,15 @@ public class LeafNode<K extends Comparable<K>, T> extends Node<K, T> {
 
 		}
 	}
+	//return 1 for successful delete, 0 if not
+	public Boolean deleteValueForKey(K key){
+		int indexOfKey = keys.indexOf(key);
+		if (indexOfKey == -1) return false;
+		
+		keys.remove(indexOfKey);
+		values.remove(indexOfKey);
+	
+		return true;
+	}
 
 }

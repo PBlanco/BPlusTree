@@ -209,7 +209,55 @@ public class BPlusTree<K extends Comparable<K>, T> {
 	 * @param key
 	 */
 	public void delete(K key) {
-
+		if (this.root == null) return;
+		Node<K,T> oldchild = this.deleteHelper(null, this.root, key);
+		
+	}
+	
+	private Node<K,T> deleteHelper(IndexNode<K,T> parentpointer, Node<K,T> nodepointer, K key){
+		if (!nodepointer.isLeafNode){
+			//do this
+		} else {
+			LeafNode<K,T> leafNode = (LeafNode<K,T>)nodepointer;
+			Boolean deleteSuccess = leafNode.deleteValueForKey(key);
+			
+			//if the key did not exists, or it was inserted and there is no overflow then return null
+			if(!deleteSuccess || !leafNode.isUnderflowed()) return null;
+			
+			//case where leaf is root node
+			if (this.root.equals(nodepointer)){
+				if (leafNode.keys.size() == 0) this.root = null;
+				return null;
+			}
+			
+			
+			//get sibling
+			LeafNode<K,T> sibling = null;
+			int handleunderflow;
+			
+			for (int i = parentpointer.keys.size()-1; i >=0; i--){
+				//if key is larger then or equal to then take the left child as sibling
+				if (key.compareTo(parentpointer.keys.get(i)) >= 0){
+					sibling = (LeafNode<K, T>) parentpointer.children.get(i);
+					break;
+				}
+			}
+			
+			if (sibling == null){
+				sibling = (LeafNode<K, T>) parentpointer.children.get(1); //edge case where key is less then all keys in index
+				handleunderflow = this.handleLeafNodeUnderflow(leafNode, sibling, parentpointer);
+			} else 
+				handleunderflow = this.handleLeafNodeUnderflow(sibling, leafNode, parentpointer);
+			
+			//TODO: check if redistribute or merge
+			
+			
+			
+			
+			
+		}
+		
+		return null;
 	}
 
 	/**
