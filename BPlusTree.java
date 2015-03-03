@@ -64,6 +64,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 				Entry<K, Node<K,T>> overflowed = this.splitLeafNode(leafNode);
 				//assigned the modified leafNode to node
 				node = leafNode;
+				
 				return overflowed;
 			}
 			//return null if insert is successful
@@ -76,28 +77,33 @@ public class BPlusTree<K extends Comparable<K>, T> {
 				Entry<K, Node<K, T>> overflowed = null;
 				
 				//if key is less than fetched then return fetched's left child
+				int index = 0;
+				Boolean inserted = false; 
 				if (key.compareTo(fetchedKey) < 0){
 					overflowed = this.insertHelper(key, value, inode.children.get(i));
-				//if you're on last key in node (and larger) traverse right child
+					index = i;
+					inserted = true;
 				}else if (i == inode.keys.size()-1) {
 					overflowed = this.insertHelper(key, value, inode.children.get(i+1));
-				}
+					index = i+1; //want to add it to the right if you went down right child
+					inserted = true;
+				} 
 				
 				//value was inserted, check if it caused an overflow
 				if(overflowed != null){
-					//insert the new pointer into the index after the split pointer who is at index i
-					inode.insertSorted(overflowed, i+1);;
+					//insert the new pointer into the index before/after split pointer 
+					inode.insertSorted(overflowed, index);;
 					//check if it has caused an overflow of the index
 					if(inode.isOverflowed()){
 						Entry<K, Node<K, T>> indexOverflow =  this.splitIndexNode(inode);
 						node = inode;
 						return indexOverflow;
-					}
-				}
+					} else return null;
+				} else if (inserted) return null;
 			}
 		}
-		return null;
 		
+		return null;
 	}
 
 	/**
@@ -135,10 +141,14 @@ public class BPlusTree<K extends Comparable<K>, T> {
 	 * @return the key/node pair as an Entry
 	 */
 	public Entry<K, Node<K,T>> splitLeafNode(LeafNode<K,T> leaf) {
-		//TODO: Fix this so that it splits correctly
 		int middleIndex = leaf.values.size()/2;
 		//get pointer (key we split on) to pass up
 		K pointer = leaf.keys.remove(middleIndex);
+		System.out.println("removed middle index: " + pointer);
+		Character p = (Character)pointer;
+		if(p == 'i'){
+			int x = 1;
+		}
 		LeafNode<K,T> leftLeafNode = new LeafNode<K,T>(pointer, leaf.values.remove(middleIndex));
 		int size =  leaf.values.size();
 		
@@ -147,6 +157,12 @@ public class BPlusTree<K extends Comparable<K>, T> {
 		for (int i = middleIndex; i <size; i++){
 			leftLeafNode.insertSorted(leaf.keys.remove(middleIndex), leaf.values.remove(middleIndex));
 		}
+		
+		//Update leaf nodes node pointers
+		leftLeafNode.nextLeaf = leaf.nextLeaf;
+		leftLeafNode.previousLeaf = leaf;
+		leaf.nextLeaf = leftLeafNode;
+		
 		//create entry object
 		Entry<K, Node<K,T>> entry = new AbstractMap.SimpleEntry<K, Node<K,T>>(pointer, leftLeafNode);
 		return entry;
@@ -163,23 +179,20 @@ public class BPlusTree<K extends Comparable<K>, T> {
 		int middleIndex = index.keys.size()/2;
 		//get pointer (key we split on) to pass up
 		K pointer = index.keys.remove(middleIndex);
-		//Node<K,T> pointerChild = index.children.remove(middleIndex+1);
-		
-		
 		
 		ArrayList<Node<K,T>> rightChildren = new ArrayList<Node<K,T>>();
 		ArrayList<K> rightKeys = new ArrayList<K>();
 		
-		
 		int size =  index.keys.size();
 		
-		//add values to right list while removing from oxiginal inded
+		//add values to right list while removing from original index
 		for (int i = middleIndex; i <size; i++){
-			rightKeys.add(index.keys.remove(i));
-			rightChildren.add(index.children.remove(middleIndex));
+			rightKeys.add(index.keys.remove(middleIndex));
+			rightChildren.add(index.children.remove(middleIndex+1));
 		}
+
 		//add last child
-		rightChildren.add(index.children.remove(middleIndex));
+		rightChildren.add(index.children.remove(middleIndex+1));
 		
 		//add values to new right index to be passed back
 		IndexNode<K,T>newIndexNode = new IndexNode<K,T>(rightKeys, rightChildren);
