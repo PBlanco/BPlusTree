@@ -2,6 +2,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 
+//TODO: Change overflowed varibale name
 /**
  * BPlusTree Class Assumptions: 1. No duplicate keys inserted 2. Order D:
  * D<=number of keys in a node <=2*D 3. All keys are non-negative
@@ -23,7 +24,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 				if (key.compareTo(fetchedKey) == 0){
 					return lnode.values.get(i);
 				// Break if the key is smaller then fetched (this means no matches)
-				} else if (key.compareTo(fetchedKey) > 0 ){ 
+				} else if (key.compareTo(fetchedKey) < 0 ){ 
 					return null;
 				}
 			}
@@ -144,7 +145,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 		int middleIndex = leaf.values.size()/2;
 		//get pointer (key we split on) to pass up
 		K pointer = leaf.keys.remove(middleIndex);
-		System.out.println("removed middle index: " + pointer);
+//		System.out.println("removed middle index: " + pointer);
 		Character p = (Character)pointer;
 		if(p == 'i'){
 			int x = 1;

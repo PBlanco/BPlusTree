@@ -41,7 +41,9 @@ public class main {
 			 
 			 System.out.println("~~~~~~~~~~k = " + String.valueOf(k) + "~~~~~~~~~~");
 			 System.out.print(test);
+//			 System.out.println("Tree search " + alphabet[k/2] + " " + tree.search(alphabet[k/2]));
 			 System.out.println('\n');
+			 
 			 
 		 }
 		 
