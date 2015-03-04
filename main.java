@@ -3,6 +3,7 @@ public class main {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		
 		System.out.println("Test:");
 
 		BPlusTree<Integer, String> tree = new BPlusTree<Integer, String>();
@@ -21,9 +22,9 @@ public class main {
 
 	
 		//insert tests
-		/*
-		 Character alphabet[] = new Character[] { 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
 		
+		 //Character alphabet[] = new Character[] { 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
+		/*
 		 Character alphabet[] = new Character[] { 'f','u','v','a','b','c','d','l','m','n','o','e','h','i','p','j','k','q','r','s','t'};
 		 
 		 for(int k = 1; k <= alphabet.length; k++){
@@ -40,13 +41,13 @@ public class main {
 			 
 			 System.out.println("~~~~~~~~~~k = " + String.valueOf(k) + "~~~~~~~~~~");
 			 System.out.print(test);
-//			 System.out.println("Tree search " + alphabet[k/2] + " " + tree.search(alphabet[k/2]));
+			 System.out.println("Tree search " + alphabet[k/2] + " " + tree.search(alphabet[k/2]));
 			 System.out.println('\n');
 			 
 			 
 		 }
-		 
 		 */
+		 
 	}
 
 }

@@ -11,7 +11,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 
 	public Node<K,T> root;
 	public static final int D = 2;
-	private LeafNode<K,T> lNode;
+	private static final int REDISTRIBUTION = -1;
 
 	private T searchHelper(K key, Node<K,T> node){
 		if(node == null) return null;
@@ -19,15 +19,10 @@ public class BPlusTree<K extends Comparable<K>, T> {
 		if (node.isLeafNode){
 			LeafNode<K, T> lnode = (LeafNode<K,T>)node;
 			//iterate through keys to find a match
-			for (int i=0; i < lnode.keys.size(); i++){
-				K fetchedKey = lnode.keys.get(i);
-				if (key.compareTo(fetchedKey) == 0){
-					return lnode.values.get(i);
-				// Break if the key is smaller then fetched (this means no matches)
-				} else if (key.compareTo(fetchedKey) < 0 ){ 
-					return null;
-				}
-			}
+			int keyindex = lnode.keys.indexOf(key);
+			if (keyindex == -1) return null;
+			return lnode.values.get(keyindex);
+			
 		} else {
 			IndexNode<K,T> inode = (IndexNode<K,T>)node;
 			for (int i=0; i< inode.keys.size(); i++){
@@ -224,16 +219,15 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			//if the key did not exists, or it was inserted and there is no overflow then return null
 			if(!deleteSuccess || !leafNode.isUnderflowed()) return null;
 			
-			//case where leaf is root node
+			//special case where leaf is root node so underflow doesnt matter
 			if (this.root.equals(nodepointer)){
 				if (leafNode.keys.size() == 0) this.root = null;
 				return null;
 			}
 			
-			
 			//get sibling
 			LeafNode<K,T> sibling = null;
-			int handleunderflow;
+			int underflow;
 			
 			for (int i = parentpointer.keys.size()-1; i >=0; i--){
 				//if key is larger then or equal to then take the left child as sibling
@@ -245,12 +239,18 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			
 			if (sibling == null){
 				sibling = (LeafNode<K, T>) parentpointer.children.get(1); //edge case where key is less then all keys in index
-				handleunderflow = this.handleLeafNodeUnderflow(leafNode, sibling, parentpointer);
+				underflow = this.handleLeafNodeUnderflow(leafNode, sibling, parentpointer);
 			} else 
-				handleunderflow = this.handleLeafNodeUnderflow(sibling, leafNode, parentpointer);
+				underflow = this.handleLeafNodeUnderflow(sibling, leafNode, parentpointer);
 			
 			//TODO: check if redistribute or merge
+		
+			//if the underflow was merged
+			if (underflow != REDISTRIBUTION){
+				//must remove splitkey in parent node
+			}
 			
+			//TODO: check if tehre should be redistrbution
 			
 			
 			
@@ -274,8 +274,35 @@ public class BPlusTree<K extends Comparable<K>, T> {
 	 */
 	public int handleLeafNodeUnderflow(LeafNode<K,T> left, LeafNode<K,T> right,
 			IndexNode<K,T> parent) {
-		return -1;
+		if(left.keys.size() + right.keys.size() <= 2*D){ //merge nodes
+			//merge right into left
+			left.keys.addAll(right.keys);
+			left.values.addAll(right.values);
+			
+			left.nextLeaf = right.nextLeaf;
+			//get split key
+			return parent.children.indexOf(right) - 1;
+			
+		} 
+		// else redistribute
+		int parentIndex = parent.children.indexOf(left);
+		
+		if(left.keys.size() > right.keys.size()){ //redistribute to right node
+			//redistribute to right
+			while(right.isUnderflowed()){
+				right.keys.add(0, left.keys.remove(left.keys.size()-1));
+				right.values.add(0, left.values.remove(left.values.size()-1));
+			}
+		} else{ //redistribute left
+			while(left.isUnderflowed()){
+				left.keys.add(right.keys.remove(0));
+				right.values.add(right.values.remove(0));
+			}
+		}
+		//change parent index to smallest right key
+		parent.keys.set(parentIndex, right.keys.get(0));
 
+		return -1;
 	}
 
 	/**
@@ -294,5 +321,6 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			IndexNode<K,T> rightIndex, IndexNode<K,T> parent) {
 		return -1;
 	}
+	
 
 }
