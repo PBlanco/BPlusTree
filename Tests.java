@@ -20,21 +20,19 @@ public class Tests {
 		Utils.bulkInsert(tree, alphabet, alphabetStrings);
 
 		String test = Utils.outputTree(tree);
-		System.out.print(test);
+//		System.out.print(test);
 		String correct = 
 		    "@c/e/@%%[(a,a);(b,b);]#[(c,c);(d,d);]#[(e,e);(f,f);(g,g);]$%%";
 		
 		
 		assertEquals(correct, test);
-		/*
 		tree.delete('a');
 
 		test = Utils.outputTree(tree);
 		correct = "@e/@%%[(b,b);(c,c);(d,d);]#[(e,e);(f,f);(g,g);]$%%";
 		assertEquals(correct, test);
-		 */
 	}
-/*
+
   // add some nodes, see if it comes out right, delete one, see if it's right
   @Test
   public void testHybrid2() {
@@ -48,11 +46,13 @@ public class Tests {
     Utils.bulkInsert(tree, primeNumbers, primeNumberStrings);
 
     String test = Utils.outputTree(tree);
+    
     String correct = "@10/@%%@5/8/@@12/14/@%%[(2,2);(4,4);]#[(5,5);(7,7);]#[(8,8);(9,9);]$[(10,10);(11,11);]#[(12,12);(13,13);]#[(14,14);(15,15);(16,16);]$%%";
     assertEquals(test, correct);
 
     tree.delete(2);
     test = Utils.outputTree(tree);
+    System.out.println(test);
     correct = "@8/10/12/14/@%%[(4,4);(5,5);(7,7);]#[(8,8);(9,9);]#[(10,10);(11,11);]#[(12,12);(13,13);]#[(14,14);(15,15);(16,16);]$%%";
     assertEquals(test, correct);
 
@@ -73,6 +73,7 @@ public class Tests {
 		tree.delete(6);
 		tree.delete(7);
 		tree.delete(8);
+		
 		String test = Utils.outputTree(tree);
 		Utils.printTree(tree);
 
@@ -122,6 +123,6 @@ public class Tests {
     }
     return (1+maxDepth);
   }
-  */
+  
 }
 

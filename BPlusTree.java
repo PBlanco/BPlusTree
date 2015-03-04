@@ -141,10 +141,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 		//get pointer (key we split on) to pass up
 		K pointer = leaf.keys.remove(middleIndex);
 		//		System.out.println("removed middle index: " + pointer);
-		Character p = (Character)pointer;
-		if(p == 'i'){
-			int x = 1;
-		}
+		
 		LeafNode<K,T> leftLeafNode = new LeafNode<K,T>(pointer, leaf.values.remove(middleIndex));
 		int size =  leaf.values.size();
 
@@ -226,7 +223,7 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			//check if nodepointer is root and if so is the root empty because of a merge 
 			if (parentpointer == null){
 				if (indexNode.keys.size() == 0){ //root is empty
-					nodepointer = indexNode.children.remove(0); //set root to its merged child
+					this.root = indexNode.children.remove(0); //set root to its merged child
 				}
 				return;
 			} else if (indexNode.isUnderflowed()){
