@@ -222,9 +222,14 @@ public class BPlusTree<K extends Comparable<K>, T> {
 					break;
 				}
 			}
-			//			TODO: Add check to make sure not root
-			//check if index is underflowed
-			if(indexNode.isUnderflowed()){
+
+			//check if nodepointer is root and if so is the root empty because of a merge 
+			if (parentpointer == null){
+				if (indexNode.keys.size() == 0){ //root is empty
+					nodepointer = indexNode.children.remove(0); //set root to its merged child
+				}
+				return;
+			} else if (indexNode.isUnderflowed()){
 				//get sibling
 				IndexNode<K,T> sibling = null;
 				int splitkey = -1;
@@ -235,11 +240,6 @@ public class BPlusTree<K extends Comparable<K>, T> {
 				} else{ 
 					sibling = (IndexNode<K, T>) parentpointer.children.get(indexNodeIndex -1); //get left sibling 
 					splitkey = this.handleIndexNodeUnderflow(sibling, indexNode, parentpointer);
-				}
-
-
-				if (splitkey != REDISTRIBUTION){
-
 				}
 				//if you merge, make sure parent isn't root before deleting. If it is then you need to merge up and make it the root
 			}
