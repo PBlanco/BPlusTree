@@ -2,7 +2,6 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 
-//TODO: Change overflowed varibale name
 /**
  * BPlusTree Class Assumptions: 1. No duplicate keys inserted 2. Order D:
  * D<=number of keys in a node <=2*D 3. All keys are non-negative
@@ -57,11 +56,11 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			//check if this overflowed node
 			if(leafNode.isOverflowed()){
 				//there was an overflow so return split leaf
-				Entry<K, Node<K,T>> overflowed = this.splitLeafNode(leafNode);
+				Entry<K, Node<K,T>> overflow = this.splitLeafNode(leafNode);
 				//assigned the modified leafNode to node
 				node = leafNode;
 
-				return overflowed;
+				return overflow;
 			}
 			//return null if insert is successful
 			return null;
@@ -70,25 +69,25 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			IndexNode<K,T> inode = (IndexNode<K,T>)node;
 			for (int i=0; i< inode.keys.size(); i++){
 				K fetchedKey = inode.keys.get(i);
-				Entry<K, Node<K, T>> overflowed = null;
+				Entry<K, Node<K, T>> overflow = null;
 
 				//if key is less than fetched then return fetched's left child
 				int index = 0;
 				Boolean inserted = false; 
 				if (key.compareTo(fetchedKey) < 0){
-					overflowed = this.insertHelper(key, value, inode.children.get(i));
+					overflow = this.insertHelper(key, value, inode.children.get(i));
 					index = i;
 					inserted = true;
 				}else if (i == inode.keys.size()-1) {
-					overflowed = this.insertHelper(key, value, inode.children.get(i+1));
+					overflow = this.insertHelper(key, value, inode.children.get(i+1));
 					index = i+1; //want to add it to the right if you went down right child
 					inserted = true;
 				} 
 
 				//value was inserted, check if it caused an overflow
-				if(overflowed != null){
+				if(overflow != null){
 					//insert the new pointer into the index before/after split pointer 
-					inode.insertSorted(overflowed, index);;
+					inode.insertSorted(overflow, index);;
 					//check if it has caused an overflow of the index
 					if(inode.isOverflowed()){
 						Entry<K, Node<K, T>> indexOverflow =  this.splitIndexNode(inode);
@@ -115,15 +114,15 @@ public class BPlusTree<K extends Comparable<K>, T> {
 			this.root = lNode;
 			return;
 		}
-		Entry<K, Node<K,T>> overflowed = this.insertHelper(key, value, this.root);
+		Entry<K, Node<K,T>> overflow = this.insertHelper(key, value, this.root);
 
 		//overflow made it to root
-		if (overflowed != null){
+		if (overflow != null){
 			Node<K,T> rootIndex =  this.root;
 			//create a new root with key as the split key, 
 			//left child as the modified right split of root,
 			//and right child as the left split of root node
-			IndexNode<K,T> newRoot = new IndexNode<K,T>(overflowed.getKey(), rootIndex, overflowed.getValue());
+			IndexNode<K,T> newRoot = new IndexNode<K,T>(overflow.getKey(), rootIndex, overflow.getValue());
 			this.root = newRoot;
 		}
 
