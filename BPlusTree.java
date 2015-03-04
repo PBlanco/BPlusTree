@@ -247,14 +247,10 @@ public class BPlusTree<K extends Comparable<K>, T> {
 		
 			//if the underflow was merged
 			if (underflow != REDISTRIBUTION){
-				//must remove splitkey in parent node
+				parentpointer.keys.remove(underflow); // remove the key that pointed you right
+				parentpointer.children.remove(underflow + 1); //remove the right child
 			}
-			
-			//TODO: check if tehre should be redistrbution
-			
-			
-			
-			
+			return null;
 		}
 		
 		return null;
